@@ -10,13 +10,11 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lib1"))
-    testImplementation(kotlin("test"))
+    implementation(project(":lib2"))
 }
 
 kotlin {
     js(IR) {
-        binaries.executable()
         nodejs {
 
         }

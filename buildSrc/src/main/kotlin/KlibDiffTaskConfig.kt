@@ -1,7 +1,10 @@
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.targets.js.ir.JsIrBinary
 
-class KlibDiffTaskConfig(val binary: JsIrBinary) {
+class KlibDiffTaskConfig(
+    val binary: JsIrBinary,
+    val klibDiffExtension: KlibDiffExtension
+    ) {
     val taskConfigActions = mutableListOf<(TaskProvider<KlibDiffTask>) -> Unit>()
 
     private var executed = false
@@ -9,7 +12,8 @@ class KlibDiffTaskConfig(val binary: JsIrBinary) {
     init {
         configureTask { task ->
             task.outputDir.set(binary.compilation.project.layout.buildDirectory.dir("klib-diff"))
-            task.libraries.from(binary.linkTask.map { it.libraries })
+            task.libraries.from({ binary.compilation.compileDependencyFiles })
+            task.threshold.value(klibDiffExtension.threshold).finalizeValue()
         }
     }
 

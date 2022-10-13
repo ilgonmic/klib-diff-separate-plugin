@@ -1,0 +1,2 @@
+fun greetingKlib() =
+    greeting("Klib")

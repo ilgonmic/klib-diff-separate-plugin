@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 rootProject.name = "klib-diff"
-
+include("lib1", "lib2")

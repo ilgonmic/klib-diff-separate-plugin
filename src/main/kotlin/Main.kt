@@ -1,6 +1,3 @@
 fun main() {
-    println(greeting("untitled1"))
+    println(greetingKlib())
 }
-
-fun greeting(name: String) =
-    "Hello, $name"
