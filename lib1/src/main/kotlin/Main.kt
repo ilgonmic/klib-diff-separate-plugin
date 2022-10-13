@@ -1,2 +1,2 @@
 fun greetingKlib() =
-    greeting("Klib")
+    greeting("Klib2")

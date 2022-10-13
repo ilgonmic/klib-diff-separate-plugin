@@ -2,15 +2,16 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Classpath
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
+import org.gradle.work.NormalizeLineEndings
 import java.io.File
 import javax.inject.Inject
 
@@ -22,6 +23,11 @@ abstract class KlibDiffTask : DefaultTask() {
     @get:Incremental
     @get:Classpath
     abstract val libraries: ConfigurableFileCollection
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:Incremental
+    abstract val entryModule: RegularFileProperty
 
     @get:Inject
     abstract val execOperations: ExecOperations
@@ -35,7 +41,7 @@ abstract class KlibDiffTask : DefaultTask() {
         val addedFiles = mutableListOf<File>()
         val modifiedFiles = mutableListOf<File>()
         val removedFiles = mutableListOf<File>()
-        inputChanges.getFileChanges(libraries)
+        (inputChanges.getFileChanges(libraries) + inputChanges.getFileChanges(entryModule))
             .forEach { change ->
                 when (change.changeType) {
                     ChangeType.ADDED -> addedFiles.add(change.file)
@@ -63,6 +69,6 @@ abstract class KlibDiffTask : DefaultTask() {
             libraries.files,
             execOperations,
             threshold.get()
-        )
+        ).saveKLibPatches()
     }
 }
