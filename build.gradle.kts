@@ -22,3 +22,7 @@ kotlin {
         }
     }
 }
+
+extensions.getByName<KlibDiffExtension>(KlibDiffExtension.NAME).also {
+    it.threshold.set(1)
+}
