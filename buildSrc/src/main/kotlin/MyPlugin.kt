@@ -12,7 +12,7 @@ class MyPlugin : Plugin<Project> {
     override fun apply(project: Project) {
 
         val klibDiffExtension = project.extensions.create(KlibDiffExtension.NAME, KlibDiffExtension::class.java).also {
-            it.threshold.convention(0)
+            it.historyLimit.convention(0)
         }
 
         project.plugins.withType(KotlinBasePlugin::class.java) {

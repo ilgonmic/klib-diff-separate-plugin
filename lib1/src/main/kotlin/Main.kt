@@ -1,2 +1,3 @@
-fun greetingKlib() =
+fun greetingKlib() {
     greeting("Klib2")
+}

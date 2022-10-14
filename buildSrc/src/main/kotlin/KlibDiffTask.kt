@@ -33,7 +33,7 @@ abstract class KlibDiffTask : DefaultTask() {
     abstract val execOperations: ExecOperations
 
     @get:Input
-    abstract val threshold: Property<Int>
+    abstract val historyLimit: Property<Int>
 
     @TaskAction
     fun calculateDiff(inputChanges: InputChanges) {
@@ -65,10 +65,12 @@ abstract class KlibDiffTask : DefaultTask() {
         }
 
         KlibPatchMaker(
+            addedFiles,
+            modifiedFiles,
+            removedFiles,
             outputDir.asFile.get(),
-            libraries.files,
             execOperations,
-            threshold.get()
+            historyLimit.get()
         ).saveKLibPatches()
     }
 }

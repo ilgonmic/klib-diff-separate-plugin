@@ -1,7 +1,7 @@
 import org.gradle.api.provider.Property
 
 interface KlibDiffExtension {
-    val threshold: Property<Int>
+    val historyLimit: Property<Int>
 
     companion object {
         const val NAME = "klibDiff"

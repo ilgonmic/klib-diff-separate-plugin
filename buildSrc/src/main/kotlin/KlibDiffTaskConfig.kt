@@ -15,7 +15,7 @@ class KlibDiffTaskConfig(
             val project = binary.compilation.project
             task.outputDir.set(project.layout.buildDirectory.dir("klib-diff"))
             task.libraries.from({ binary.compilation.compileDependencyFiles })
-            task.threshold.value(klibDiffExtension.threshold).finalizeValue()
+            task.historyLimit.value(klibDiffExtension.historyLimit).finalizeValue()
             task.entryModule.set(
                 project.tasks.named(binary.compilation.target.artifactsTaskName, Jar::class.java)
                     .flatMap { it.archiveFile }

@@ -24,5 +24,5 @@ kotlin {
 }
 
 extensions.getByName<KlibDiffExtension>(KlibDiffExtension.NAME).also {
-    it.threshold.set(1)
+    it.historyLimit.set(3)
 }
