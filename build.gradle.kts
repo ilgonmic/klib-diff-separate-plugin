@@ -2,9 +2,10 @@ plugins {
     kotlin("js")
 }
 
-apply<MyPlugin>()
+apply<klib.director.KlibDirectorPlugin>()
 
 repositories {
+    maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") }
     mavenCentral()
     mavenLocal()
 }
@@ -21,8 +22,4 @@ kotlin {
 
         }
     }
-}
-
-extensions.getByName<KlibDiffExtension>(KlibDiffExtension.NAME).also {
-    it.historyLimit.set(3)
 }

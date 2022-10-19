@@ -1,3 +1,3 @@
 fun main() {
-    println(greetingKlib())
+    println("${greetingKlib()}!")
 }

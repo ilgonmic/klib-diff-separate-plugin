@@ -1,22 +1,20 @@
+package klib.director
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.jvm.tasks.Jar
 import org.gradle.process.ExecOperations
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
-import org.gradle.work.NormalizeLineEndings
+import org.jetbrains.kotlin.gradle.targets.js.ir.JsIrBinary
 import java.io.File
-import javax.inject.Inject
 
-abstract class KlibDiffTask : DefaultTask() {
-
+abstract class KlibRecorderTask : DefaultTask() {
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -29,48 +27,46 @@ abstract class KlibDiffTask : DefaultTask() {
     @get:Incremental
     abstract val entryModule: RegularFileProperty
 
-    @get:Inject
-    abstract val execOperations: ExecOperations
-
     @get:Input
-    abstract val historyLimit: Property<Int>
+    abstract val klibsLimit: Property<Int>
 
     @TaskAction
-    fun calculateDiff(inputChanges: InputChanges) {
-        println(inputChanges.isIncremental)
+    fun storeModifiedKlibs(inputChanges: InputChanges) {
         val addedFiles = mutableListOf<File>()
         val modifiedFiles = mutableListOf<File>()
         val removedFiles = mutableListOf<File>()
-        (inputChanges.getFileChanges(libraries) + inputChanges.getFileChanges(entryModule))
-            .forEach { change ->
+        val modules = inputChanges.getFileChanges(libraries) + inputChanges.getFileChanges(entryModule)
+        modules.forEach { change ->
+            if (change.file.isKlibFile() && change.file.exists()) {
                 when (change.changeType) {
                     ChangeType.ADDED -> addedFiles.add(change.file)
                     ChangeType.MODIFIED -> modifiedFiles.add(change.file)
                     ChangeType.REMOVED -> removedFiles.add(change.file)
                 }
             }
-        println("ADDED")
-        addedFiles.forEach {
-            println(it)
         }
 
-        println("MOD")
-        modifiedFiles.forEach {
-            println(it)
-        }
-
-        println("REMOVED")
-        removedFiles.forEach {
-            println(it)
-        }
-
-        KlibPatchMaker(
+        KlibRecorder(
+            entryModule.get().asFile,
             addedFiles,
             modifiedFiles,
             removedFiles,
             outputDir.asFile.get(),
-            execOperations,
-            historyLimit.get()
-        ).saveKLibPatches()
+            klibsLimit.get()
+        ).storeModifiedKlibs()
+    }
+}
+
+class KlibRecorderTaskConfig(private val binary: JsIrBinary, private val klibsLimit: Int) :
+    KlibDirectorTaskConfigAbstract<KlibRecorderTask>() {
+    override fun configActionImpl(task: KlibRecorderTask) {
+        val project = binary.compilation.project
+        task.outputDir.set(project.layout.buildDirectory.dir("klib-records"))
+        task.libraries.from({ binary.compilation.compileDependencyFiles })
+        task.klibsLimit.value(klibsLimit).finalizeValue()
+        task.entryModule.set(
+            project.tasks.named(binary.compilation.target.artifactsTaskName, Jar::class.java)
+                .flatMap { it.archiveFile }
+        )
     }
 }

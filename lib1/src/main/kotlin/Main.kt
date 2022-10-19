@@ -1,3 +1,3 @@
 fun greetingKlib() {
-    greeting("Klib2")
+    greeting("Klib1!")
 }

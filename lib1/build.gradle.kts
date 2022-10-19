@@ -2,9 +2,8 @@ plugins {
     kotlin("js")
 }
 
-apply<MyPlugin>()
-
 repositories {
+    maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") }
     mavenCentral()
     mavenLocal()
 }
